@@ -77,15 +77,22 @@ int main(int argc, char *argv[])
 	printf("client: connecting to %s\n", s);
 
 	freeaddrinfo(servinfo); // all done with this structure
+	
 
-	if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
-	    perror("recv");
-	    exit(1);
+	char bigBuffer[100000];
+	int bigCount = 0;
+	do{
+		if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+	    		perror("recv");
+	    		exit(1);
+		}
+	bigCount +=numbytes;
+	strcat(bigBuffer, buf);
 	}
+	while(buf[numbytes - 1] != 0);
+	bigBuffer[bigCount] = '\0';
 
-	buf[numbytes] = '\0';
-
-	printf("client: received '%s'\n",buf);
+	printf("client: received '%s'\n",bigBuffer);
 
 	close(sockfd);
 
