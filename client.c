@@ -78,21 +78,43 @@ int main(int argc, char *argv[])
 
 	freeaddrinfo(servinfo); // all done with this structure
 	
+	int guard = 1;
+	
+while(guard){
+	
+        char bigBuffer[100000];
+        int bigCount = 0;
 
-	char bigBuffer[100000];
-	int bigCount = 0;
-	do{
-		if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
-	    		perror("recv");
-	    		exit(1);
-		}
-	bigCount +=numbytes;
-	strcat(bigBuffer, buf);
+	printf("Command (type 'h' for help): ");
+	char command[255];
+	scanf("%255s", command);
+	switch( command[0] ){
+		case 'h':
+		printf("help\n");
+		break;
+		case 'q':
+		exit(0);
+		case 'l':
+		send(sockfd, "cl", 2,0);
+		        do{
+                if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+                        perror("recv");
+                        exit(1);
+                }
+        bigCount +=numbytes;
+        strcat(bigBuffer, buf);
+        }
+        while(buf[numbytes - 1] != 0);
+        bigBuffer[bigCount] = '\0';
+
+        printf("client: received '%s'\n",bigBuffer);
+
+		break;
 	}
-	while(buf[numbytes - 1] != 0);
-	bigBuffer[bigCount] = '\0';
+	
 
-	printf("client: received '%s'\n",bigBuffer);
+}
+
 
 	close(sockfd);
 

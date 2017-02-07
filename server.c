@@ -112,8 +112,21 @@ int main(void)
 			get_in_addr((struct sockaddr *)&their_addr),
 			s, sizeof s);
 		printf("server: got connection from %s\n", s);
-		
-
+	int guard = 1;	        
+		while(guard){
+		char buf[500];
+  		int numbytes;      	
+		do{
+                if ((numbytes = recv(new_fd, buf, 500-1, 0)) == -1) {
+                        perror("recv");
+                        exit(1);
+                	}
+		}
+		while(buf[0] != 'c');
+        	buf[numbytes] = 0;
+		printf(buf);
+		switch(buf[1]){
+		case 'l':
 		if (!fork()) { // this is the child process
 			close(sockfd); // child doesn't need the listener
 			dup2(new_fd, 1);
@@ -122,10 +135,18 @@ int main(void)
 			//close(new_fd);
 			exit(0);
 		}
+		break;
+		case 'q':
+		default:
+		guard = 0;
+		close(new_fd);
+		break;
+		
+		}
 		write(new_fd, 0 , 1);
-		close(new_fd);  // parent doesn't need this
-	}
 
+}
+}
 	return 0;
 }
 
