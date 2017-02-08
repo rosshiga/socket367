@@ -149,6 +149,7 @@ int main(int argc, char *argv[]) {
             }else {
                 char *filebuff = calloc(filesize, sizeof(char)); //Allocate char array of file size
                 recv(sockfd, filebuff, filesize, 0); // Receive file to allocated array
+                printf("contents : \n%s", filebuff); // debug
                 printf("Save as: "); //client side filename
                 scanf("%s", &filename);
                 //download file from server
