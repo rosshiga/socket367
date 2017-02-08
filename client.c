@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
             send(sockfd, filename, 100, 0); //receieve server file string
             //char sizebuffer[100];
             numbytes = recv(sockfd, sizeofFile, 20, 0);
-            filesize = (int)strtol(sizeofFile);
+            filesize = (int)strtol(sizeofFile, (char *) NULL, 10);
             printf("Size file: %d \n", filesize);
             char *filebuff = calloc(filesize, sizeof(char));
 
