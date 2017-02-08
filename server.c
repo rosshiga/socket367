@@ -146,7 +146,7 @@ int main(void)
         if ((pid = fork()) == 0) {
           dup2(new_fd, 1);
           execl("/usr/bin/ls", "ls", (char *)NULL);
-          error("could not exec 'ls'");
+          perror("could not exec 'ls'");
         }
 
         wait(&status);
@@ -156,10 +156,6 @@ int main(void)
 
       if (!strcmp(rec_cmd, "disp")) /// display file and send back ////
       {
-
-
-
-
         FILE *fp;
 
 
@@ -181,25 +177,25 @@ int main(void)
 		fseek(fp, 0L, SEEK_END);
 		int filesize = ftell(fp);
 		fseek(fp, 0 , SEEK_SET);
-		char *filebuff = calloc(filesize, sizeof(char));
+		char *filebuff = (char *) calloc(filesize, sizeof(char));
 		fread(filebuff, sizeof(char), filesize, fp);
 		fclose(fp);
-		send(new_fd, filebuff, filesize, 0);
-		free(filebuff);
+		send(numbytes/*new_fd*/, filebuff, filesize, 0);
+	//	free(filebuff);
 		
 		}
 
-	while(1)
+/*	while(1)
 	{
 	unsigned char buff[100]={0};
 	int nread = fread(buff, 1,100,fp);
 	printf("read bytes\n",nread);
 
-		if(nread > 0)
-		{
+		//if(nread > 0)
+		//{
 		printf("sending\n");
-		write(rec_cmd,buff,nread);
-		}
+		write(numbytes,rec_cmd,/buff,/nread);
+		//}
 		if(nread < 100)
 		{
 			if(feof(fp))printf("end of file\n");
@@ -208,7 +204,9 @@ int main(void)
 		}
 		
 		
-	}
+	}*/
+	close(new_fd);
+	exit(0);
       }
 
       //Check command

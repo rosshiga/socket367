@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 	while(numbytes = recv(sockfd, buf, MAXDATASIZE-1,0) > 0)
 	{
 	printf("got %d bytes\n",numbytes);
-	fwrite(MAXDATASIZE-1, 1, numbytes, fp);
+	fwrite(buf, MAXDATASIZE-1,/* 1,*/ numbytes, fp);
 	}
 	
 
