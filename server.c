@@ -172,7 +172,9 @@ int main(void) {
                     fseek(fp, 0, SEEK_SET); // Reset fp to top of file
                     char *filebuff = calloc(filesize, sizeof(char)); //Allocate array for file
                     printf("Size file: %d \n", filesize);
-                    send(new_fd, filesize, sizeof(int), 0); // Send file size to client
+                    char sendSize[20] = {0};
+                    snprintf(sendSize, 20, "%d", filesize);
+                    send(new_fd, sendSize, 20, 0); // Send file size to client
                     fread(filebuff, sizeof(char), filesize, fp); // Read file
                     fclose(fp); // Release file io
                     send(new_fd, filebuff, filesize, 0); // Send file size to

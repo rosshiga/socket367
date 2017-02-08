@@ -138,10 +138,12 @@ int main(int argc, char *argv[]) {
             printf("enter file name: \n"); //client side file name
             scanf("%s", &filename);
             int filesize;
+            char sizeofFile[20] = {0};
             send(sockfd, filename, 100, 0); //receieve server file string
             //char sizebuffer[100];
-            numbytes = recv(sockfd, filesize, sizeof(int), 0);
-            //filesize = (int)strtol(sizebuffer);
+            numbytes = recv(sockfd, sizeofFile, 20, 0);
+            filesize = (int)strtol(sizebuffer);
+            printf("Size file: %d \n", filesize);
             char *filebuff = calloc(filesize, sizeof(char));
 
             numbytes = recv(sockfd, filebuff, filesize, 0);
