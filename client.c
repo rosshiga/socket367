@@ -143,10 +143,10 @@ int main(int argc, char *argv[]) {
             numbytes = recv(sockfd, filesize, sizeof(int), 0);
             //filesize = (int)strtol(sizebuffer);
             char *filebuff = calloc(filesize, sizeof(char));
-            while (1) {
+
                 numbytes = recv(sockfd, filebuff, filesize, 0);
                 printf("%s\n", filebuff);
-            }
+
 
             printf("Displaying File: %s\n", fileName); //client side filename
             //printf("%s\n",buf); //print server sent file contents
