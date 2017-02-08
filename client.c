@@ -131,14 +131,14 @@ int main(int argc, char *argv[]) {
 
         if (cmd == 'p') // display function
         {
-            char fileName[50];
+
 
 
             send(sockfd, "disp", 50, 0); //send server cmd input
             printf("enter file name: \n"); //client side file name
-            scanf("%s", &fileName);
+            scanf("%s", &filename);
             int filesize;
-            send(sockfd, fileName, 100, 0); //receieve server file string
+            send(sockfd, filename, 100, 0); //receieve server file string
             //char sizebuffer[100];
             numbytes = recv(sockfd, filesize, sizeof(int), 0);
             //filesize = (int)strtol(sizebuffer);
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
 
 
             printf("Save as: "); //client side filename
-            scanf("%s", &fileName);
+            scanf("%s", &filename);
             //download file from server
             FILE *fp;
             fp = fopen(filename, "w");
