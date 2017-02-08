@@ -164,9 +164,10 @@ int main(int argc, char *argv[]) {
                 fseek(fp, 0, SEEK_SET); // Reset fp to top of file
                 /// If file is blank, isblank is 0, else its not blank
                 if(!isblank){
+                    char choice[5];
                     printf("File %s exist. Do you want to override? (y/n): ", filename ); //client side filename
-                    scanf("%c", &cmd);
-                    if(tolower(cmd) == 'n')
+                    scanf("%4s", &choice);
+                    if(tolower(cmd[0]) == 'n')
                         continue;
                 }
                 recv(sockfd, filebuff, filesize, 0); // Receive file to allocated array
