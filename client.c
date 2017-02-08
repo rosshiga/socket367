@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
                         char choice[5];
                         printf("File %s exist. Do you want to override? (y/n): ", filename ); //client side filename
                         scanf("%4s", &choice);
-                        if(tolower(cmd[0]) == 'n') // User no like override
+                        if(tolower(choice[0]) == 'n') // User no like override
                             fclose(fp); // Close file
                             free(filebuff); // Free allocated buffer
                             continue; // Reset while loop
