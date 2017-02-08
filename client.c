@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
       scanf("%s", &filename);
       while (getchar() != '\n') continue;
 
-      //Sending fielname to server
+      //Sending filename to server
       send(sockfd, filename, MAXDATASIZE, 0);
       numb = recv(sockfd, buf, MAXDATASIZE - 1, 0);
       buf[numb] = '\0';
@@ -142,7 +142,6 @@ int main(int argc, char *argv[])
       send(sockfd, "disp", 50, 0); //send server cmd input
       printf("enter file name: \n"); //client side file name
       scanf("%s", &fileName);
-
       while (1)
       {
         send(sockfd, fileName, 100, 0); //receieve server file string
@@ -153,6 +152,23 @@ int main(int argc, char *argv[])
 
       printf("Displaying File: %s\n", fileName); //client side filename
       //printf("%s\n",buf); //print server sent file contents
+
+	//download file from server
+	FILE *fp;
+	fp = fopen("file1.txt","w");
+	if(NULL==fp){
+	printf("error opening file");
+	return 1;
+	}
+
+	//recieve data in 100 btyes
+	while(numbytes = recv(sockfd, buf, MAXDATASIZE-1,0) > 0)
+	{
+	printf("got %d bytes\n",numbytes);
+	fwrite(MAXDATASIZE-1, 1, numbytes, fp);
+	}
+	
+
 
       close(sockfd);
     }

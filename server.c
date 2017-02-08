@@ -189,6 +189,26 @@ int main(void)
 		
 		}
 
+	while(1)
+	{
+	unsigned char buff[100]={0};
+	int nread = fread(buff, 1,100,fp);
+	printf("read bytes\n",nread);
+
+		if(nread > 0)
+		{
+		printf("sending\n");
+		write(rec_cmd,buff,nread);
+		}
+		if(nread < 100)
+		{
+			if(feof(fp))printf("end of file\n");
+			if(ferror(fp))printf("error reading\n");
+			break;
+		}
+		
+		
+	}
       }
 
       //Check command
