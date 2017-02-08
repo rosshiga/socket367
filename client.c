@@ -153,26 +153,31 @@ int main(int argc, char *argv[]) {
                 scanf("%s", &filename);
                 //download file from server
                 FILE *fp;
-                fp = fopen(filename, "r");
+                fp = fopen(filename, "w");
                 if (NULL == fp) {
-                // File doesn't exist so proceed
-                } else{
-                // File does exist ask user how to proceed
-                        char choice[5];
-                        printf("File %s exist. Do you want to override? (y/n): ", filename ); //client side filename
-                        scanf("%4s", &choice);
-                        if(tolower(choice[0]) == 'n') { // User no like override
-                            fclose(fp); // Close file
-                            free(filebuff); // Free allocated buffer
-                            continue; // Reset while loop
-                        }
+                    printf("error opening file");
+                    return 1;
                 }
-                freopen(filename, "w", fp);
+
+                fseek(fp, 0L, SEEK_END); // Jump to end of file
+                int isblank = ftell(fp); // Find byte size from byte 0 to EOF
+                fseek(fp, 0, SEEK_SET); // Reset fp to top of file
+                /// If file is blank, isblank is 0, else its not blank
+                if(!isblank){
+                    char choice[5];
+                    printf("File %s exist. Do you want to override? (y/n): ", filename ); //client side filename
+                    scanf("%4s", &choice);
+                    if(tolower(choice[0]) == 'n') {
+                        fclose(fp); // Close file
+                        free(filebuff); // Free allocated buffer
+
+                        continue;
+                    }
+                }
                 recv(sockfd, filebuff, filesize, 0); // Receive file to allocated array
                 fwrite(filebuff, 1, filesize, fp); // Write filesize # of bytes to fp
                 fclose(fp); // Close file
                 free(filebuff); // Free allocated buffer
-
 
 
             }
