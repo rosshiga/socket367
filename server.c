@@ -171,12 +171,13 @@ int main(void) {
                     int filesize = ftell(fp); // Find byte size from byte 0 to EOF
                     fseek(fp, 0, SEEK_SET); // Reset fp to top of file
                     char *filebuff = calloc(filesize, sizeof(char)); //Allocate array for file
+                    printf("Size file: %n \n", filesize);
                     send(new_fd, filesize, sizeof(int), 0); // Send file size to client
                     fread(filebuff, sizeof(char), filesize, fp); // Read file
                     fclose(fp); // Release file io
                     send(new_fd, filebuff, filesize, 0); // Send file size to
                     free(filebuff); // Free dynamic array
-                    printf("Size file: %n \n", filesize);
+
 
 
 //                    while (1) {
