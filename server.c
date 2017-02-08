@@ -176,7 +176,7 @@ int main(void) {
                     fclose(fp); // Release file io
                     send(new_fd, filebuff, filesize, 0); // Send file size to
                     free(filebuff); // Free dynamic array
-                    printf("Size file: %s - size %n bytes", rec_cmd, filesize);
+                    printf("Size file: %n \n", filesize);
 
 
 //                    while (1) {
