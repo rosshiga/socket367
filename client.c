@@ -139,16 +139,15 @@ int main(int argc, char *argv[]) {
             scanf("%s", &filename);
             int filesize;
             char sizeofFile[20] = {0};
-            send(sockfd, filename, 100, 0); //receieve server file string
-            //char sizebuffer[100];
-            numbytes = recv(sockfd, sizeofFile, 20, 0);
-            filesize = (int)strtol(sizeofFile, (char *) NULL, 10);
+            send(sockfd, filename, 100, 0); //receive server file string
+            numbytes = recv(sockfd, sizeofFile, 20, 0); // Receive back the file size from server
+            filesize = (int)strtol(sizeofFile, (char *) NULL, 10); //Change the chars the server sent us back to int
             printf("Size file: %d \n", filesize);
-            char *filebuff = calloc(filesize, sizeof(char));
-
-            numbytes = recv(sockfd, filebuff, filesize, 0);
-
-
+            if(filesize == 0){
+                printf("File not found"); // 0 indicates file not found
+                break; //Abort download
+            }
+            char *filebuff = calloc(filesize, sizeof(char)); //Allocate char array of file size
 
             printf("Save as: "); //client side filename
             scanf("%s", &filename);
@@ -159,10 +158,10 @@ int main(int argc, char *argv[]) {
                 printf("error opening file");
                 return 1;
             }
-            numbytes = recv(sockfd, filebuff, filesize, 0);
-            fwrite(filebuff, 1, filesize, fp);
-            fclose(fp);
-            free(filebuff);
+            numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file to allocated array
+            fwrite(filebuff, 1, filesize, fp); // Write filesize # of bytes to fp
+            fclose(fp); // Close file
+            free(filebuff); // Free allocated buffer
 
 
 
