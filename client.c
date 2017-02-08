@@ -80,7 +80,8 @@ int main(int argc, char *argv[])
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
               s, sizeof s);
     printf("client: connecting to %s\n", s);
-
+	
+    char filename[MAXDATASIZE];
     freeaddrinfo(servinfo); // all done with this structure
 
     //  while(cmd != 'q'){ //////////////////////////////////while loop//////////////////

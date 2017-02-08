@@ -157,44 +157,37 @@ int main(void)
       if (!strcmp(rec_cmd, "disp")) /// display file and send back ////
       {
 
-        if ((numbytes = recv(new_fd, rec_cmd, 100 - 1, 0)) == -1)
-        {
-          perror("recvdisplay"); exit;
-        }
-        rec_cmd[numbytes] = '\0'; printf("got filename\n");
 
-        dup2(new_fd, 1);
-        //execl("/user/bin/less", rec_cmd,(char *)NULL);
-        //error("not displaying 'less'");
+
 
         FILE *fp;
-        int fsize;
-        char dis[100];
+
 
         if ((numbytes = recv(new_fd, rec_cmd, 100 - 1, 0)) == -1)
         {
           perror("recvdisplay"); exit;
         }
         rec_cmd[numbytes] = '\0'; printf("got filename\n");
-        //dis = rec_cmd;
-        printf("%s\n", rec_cmd);
-        if (!fork())
-        {
-          //dup2(new_fd,1);
-          //fp = fopen(rec_cmd,"r");
-          while (1)
+
+        printf("filename to get: %s\n", rec_cmd);
+		
+	fp = fopen(rec_cmd, "r");
+        if (fp == NULL){
+          send(new_fd, "File not found", 14, 0);
+        printf("file not found");
+	}
+	else
           {
-            dup2(new_fd, 1);
-            fsize = fgetc(fp);
-            if (feof(fp))break;
-            printf("%c", fsize);
-          }
-          printf("from display\n");
-
-          fclose(fp);
-          printf("\n");
-        }
-
+		fseek(fp, 0L, SEEK_END);
+		int filesize = ftell(fp);
+		fseek(fp, 0 , SEEK_SET);
+		char *filebuff = calloc(filesize, sizeof(char));
+		fread(filebuff, sizeof(char), filesize, fp);
+		fclose(fp);
+		send(new_fd, filebuff, filesize, 0);
+		free(filebuff);
+		
+		}
 
       }
 
@@ -232,4 +225,3 @@ int main(void)
 
   return 0;
 }
-
