@@ -167,34 +167,35 @@ int main(void) {
                     send(new_fd, "File not found", 14, 0);
                     printf("file not found");
                 } else {
-                    fseek(fp, 0L, SEEK_END);
-                    int filesize = ftell(fp);
-                    fseek(fp, 0, SEEK_SET);
-                    char *filebuff = calloc(filesize, sizeof(char));
-                    send(new_fd, filesize, sizeof(int), 0);
-                    fread(filebuff, sizeof(char), filesize, fp);
-                    fclose(fp);
-                    send(new_fd, filebuff, filesize, 0);
-                    free(filebuff);
+                    fseek(fp, 0L, SEEK_END); // Jump to end of file
+                    int filesize = ftell(fp); // Find byte size from byte 0 to EOF
+                    fseek(fp, 0, SEEK_SET); // Reset fp to top of file
+                    char *filebuff = calloc(filesize, sizeof(char)); //Allocate array for file
+                    send(new_fd, filesize, sizeof(int), 0); // Send file size to client
+                    fread(filebuff, sizeof(char), filesize, fp); // Read file
+                    fclose(fp); // Release file io
+                    send(new_fd, filebuff, filesize, 0); // Send file size to
+                    free(filebuff); // Free dynamic array
+                    printf("Size file: %s - size %n bytes", rec_cmd, filesize);
 
 
-                    while (1) {
-                        unsigned char buff[100] = {0};
-                        int nread = fread(buff, 1, 100, fp);
-                        printf("read bytes\n", nread);
-
-                        if (nread > 0) {
-                            printf("sending\n");
-                            write(rec_cmd, buff, nread);
-                        }
-                        if (nread < 100) {
-                            if (feof(fp))printf("end of file\n");
-                            if (ferror(fp))printf("error reading\n");
-                            break;
-                        }
-
-
-                    }
+//                    while (1) {
+//                        unsigned char buff[100] = {0};
+//                        int nread = fread(buff, 1, 100, fp);
+//                        printf("read bytes\n", nread);
+//
+//                        if (nread > 0) {
+//                            printf("sending\n");
+//                            write(rec_cmd, buff, nread);
+//                        }
+//                        if (nread < 100) {
+//                            if (feof(fp))printf("end of file\n");
+//                            if (ferror(fp))printf("error reading\n");
+//                            break;
+//                        }
+//
+//
+//                    }
                 }
             }
 
