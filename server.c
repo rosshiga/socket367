@@ -164,7 +164,7 @@ int main(void) {
 
                 fp = fopen(rec_cmd, "r"); // Open target file
                 if (fp == NULL) {
-                    send(new_fd, "-1", 1, 0); // Send file size 0 to let client know not found
+                    send(new_fd, "0", 1, 0); // Send file size 0 to let client know not found
                     printf("file not found");
                 } else {
                     fseek(fp, 0L, SEEK_END); // Jump to end of file

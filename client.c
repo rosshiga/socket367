@@ -143,8 +143,8 @@ int main(int argc, char *argv[]) {
             numbytes = recv(sockfd, sizeofFile, 20, 0); // Receive back the file size from server
             filesize = (int)strtol(sizeofFile, (char *) NULL, 10); //Change the chars the server sent us back to int
             printf("Size file: %d \n", filesize);
-            if(filesize < 0){
-                printf("File not found"); // -1 indicates file not found
+            if(filesize == 0){
+                printf("File not found"); // 0 indicates file not found
                 break; //Abort download
             }
             char *filebuff = calloc(filesize, sizeof(char)); //Allocate char array of file size
