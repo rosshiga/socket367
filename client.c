@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
             filesize = (int)strtol(sizeofFile, (char *) NULL, 10); //Change the chars the server sent us back to int
             printf("Size file: %d \n", filesize);
             if(filesize == 0){
-                printf("File not found"); // 0 indicates file not found
+                printf("File not found\n"); // 0 indicates file not found
                 continue;
             }else {
                 char *filebuff = calloc(filesize, sizeof(char)); //Allocate char array of file size
@@ -158,7 +158,18 @@ int main(int argc, char *argv[]) {
                     printf("error opening file");
                     return 1;
                 }
-                numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file to allocated array
+
+                fseek(fp, 0L, SEEK_END); // Jump to end of file
+                int isblank = ftell(fp); // Find byte size from byte 0 to EOF
+                fseek(fp, 0, SEEK_SET); // Reset fp to top of file
+                /// If file is blank, isblank is 0, else its not blank
+                if(!isblank){
+                    printf("File %s exist. Do you want to override? (y/n): ", filename ); //client side filename
+                    scanf("%c", &cmd);
+                    if(tolower(cmd) == 'n')
+                        continue;
+                }
+                recv(sockfd, filebuff, filesize, 0); // Receive file to allocated array
                 fwrite(filebuff, 1, filesize, fp); // Write filesize # of bytes to fp
                 fclose(fp); // Close file
                 free(filebuff); // Free allocated buffer
