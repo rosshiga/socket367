@@ -144,26 +144,24 @@ int main(int argc, char *argv[]) {
             //filesize = (int)strtol(sizebuffer);
             char *filebuff = calloc(filesize, sizeof(char));
 
-                numbytes = recv(sockfd, filebuff, filesize, 0);
-                printf("%s\n", filebuff);
+            numbytes = recv(sockfd, filebuff, filesize, 0);
 
 
-            printf("Displaying File: %s\n", fileName); //client side filename
-            //printf("%s\n",buf); //print server sent file contents
 
+            printf("Save as: "); //client side filename
+            scanf("%s", &fileName);
             //download file from server
             FILE *fp;
-            fp = fopen("file1.txt", "w");
+            fp = fopen(filename, "w");
             if (NULL == fp) {
                 printf("error opening file");
                 return 1;
             }
+            numbytes = recv(sockfd, filebuff, filesize, 0);
+            fwrite(filebuff, 1, filesize, fp);
+            fclose(fp);
+            free(filebuff);
 
-            //recieve data in 100 btyes
-            while (numbytes = recv(sockfd, buf, MAXDATASIZE - 1, 0) > 0) {
-                printf("got %d bytes\n", numbytes);
-                fwrite(MAXDATASIZE - 1, 1, numbytes, fp);
-            }
 
 
             close(sockfd);
