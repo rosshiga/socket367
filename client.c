@@ -145,27 +145,30 @@ int main(int argc, char *argv[]) {
             printf("Size file: %d \n", filesize);
             if(filesize == 0){
                 printf("File not found"); // 0 indicates file not found
-                break; //Abort download
+                continue;
+            }else {
+                char *filebuff = calloc(filesize, sizeof(char)); //Allocate char array of file size
+
+                printf("Save as: "); //client side filename
+                scanf("%s", &filename);
+                //download file from server
+                FILE *fp;
+                fp = fopen(filename, "w");
+                if (NULL == fp) {
+                    printf("error opening file");
+                    return 1;
+                }
+                numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file to allocated array
+                fwrite(filebuff, 1, filesize, fp); // Write filesize # of bytes to fp
+                fclose(fp); // Close file
+                free(filebuff); // Free allocated buffer
+
+
             }
-            char *filebuff = calloc(filesize, sizeof(char)); //Allocate char array of file size
-
-            printf("Save as: "); //client side filename
-            scanf("%s", &filename);
-            //download file from server
-            FILE *fp;
-            fp = fopen(filename, "w");
-            if (NULL == fp) {
-                printf("error opening file");
-                return 1;
-            }
-            numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file to allocated array
-            fwrite(filebuff, 1, filesize, fp); // Write filesize # of bytes to fp
-            fclose(fp); // Close file
-            free(filebuff); // Free allocated buffer
-
-
-
             close(sockfd);
+        }
+        if(cmd == 'q'){
+            break;
         }
     }////////while loop///////////////////////////
     close(sockfd);
