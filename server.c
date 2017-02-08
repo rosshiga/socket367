@@ -171,6 +171,7 @@ int main(void) {
                     int filesize = ftell(fp);
                     fseek(fp, 0, SEEK_SET);
                     char *filebuff = calloc(filesize, sizeof(char));
+                    send(new_fd, filesize, sizeof(int), 0);
                     fread(filebuff, sizeof(char), filesize, fp);
                     fclose(fp);
                     send(new_fd, filebuff, filesize, 0);

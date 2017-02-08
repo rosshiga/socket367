@@ -137,11 +137,15 @@ int main(int argc, char *argv[]) {
             send(sockfd, "disp", 50, 0); //send server cmd input
             printf("enter file name: \n"); //client side file name
             scanf("%s", &fileName);
+            int filesize;
+            send(sockfd, fileName, 100, 0); //receieve server file string
+            //char sizebuffer[100];
+            numbytes = recv(sockfd, filesize, sizeof(int), 0);
+            //filesize = (int)strtol(sizebuffer);
+            char *filebuff = calloc(filesize, sizeof(char));
             while (1) {
-                send(sockfd, fileName, 100, 0); //receieve server file string
-                numbytes = recv(sockfd, buf, MAXDATASIZE - 1, 0);
-                buf[numbytes] = '\0';
-                printf("%s\n", buf);
+                numbytes = recv(sockfd, filebuff, filesize, 0);
+                printf("%s\n", filebuff);
             }
 
             printf("Displaying File: %s\n", fileName); //client side filename
