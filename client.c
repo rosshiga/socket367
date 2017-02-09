@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
             char sizeofFile[20] = {0};
             send(sockfd, filename, 100, 0); //receive server file string
             numbytes = recv(sockfd, sizeofFile, 20, 0); // Receive back the file size from server
-            filesize = (int) strtol(sizeofFile, (char *) NULL, 10); //Change the  chars the server sent us back to int
+            filesize = (int) strtol(sizeofFile, (char **) NULL, 10); //Change the  chars the server sent us back to int
             printf("Size file: %d \n", filesize);
             if (filesize == 0) {
                 printf("File not found"); // 0 indicates file not found
