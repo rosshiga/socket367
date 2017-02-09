@@ -154,6 +154,19 @@ int main(int argc, char *argv[]) {
                 scanf("%s", &filename);
                 //download file from server
                 FILE *fp;
+                fp = fopen(filename, "r");
+                if (fp != NULL) {
+                    char choice[5];
+                    printf("File %s exist. Do you want to override? (y/n): ", filename); //client side filename
+                    scanf("%4s", &choice);
+                    if (tolower(choice[0]) == 'n') {
+                        fclose(fp); // Close file
+                        free(filebuff); // Free allocated buffer
+                        continue;
+                    }
+                }
+
+                // fp is null, write file
                 fp = fopen(filename, "w");
                 if (NULL == fp) {
                     printf("error opening file");
