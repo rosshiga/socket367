@@ -133,23 +133,22 @@ int main(int argc, char *argv[]) {
         {
 
 
-
             send(sockfd, "disp", 50, 0); //send server cmd input
             printf("enter file name: \n"); //client side file name
             scanf("%s", &filename);
             int filesize;
             char sizeofFile[20] = {0};
             send(sockfd, filename, 100, 0); //receive server file string
-            numbytes = recv(sockfd, sizeofFile, 20, 0); // Receive back the file                    size from server
-            filesize = (int)strtol(sizeofFile, (char *) NULL, 10); //Change the                    chars the server sent us back to int
+            numbytes = recv(sockfd, sizeofFile, 20, 0); // Receive back the file size from server
+            filesize = (int) strtol(sizeofFile, (char *) NULL, 10); //Change the  chars the server sent us back to int
             printf("Size file: %d \n", filesize);
-            if(filesize == 0){
+            if (filesize == 0) {
                 printf("File not found"); // 0 indicates file not found
                 continue;
-            }else {
-                char *filebuff = calloc(filesize + 1, sizeof(char)); //Allocate char                    array of file size
-        sleep(1);        
-	numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file                    to allocated array
+            } else {
+                char *filebuff = calloc(filesize + 1, sizeof(char)); //Allocate char rray of file size
+                sleep(1);
+                numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file  to allocated array
                 printf("contents : \n%s", filebuff); // debug
                 printf("Save as: "); //client side filename
                 scanf("%s", &filename);
@@ -160,7 +159,7 @@ int main(int argc, char *argv[]) {
                     printf("error opening file");
                     return 1;
                 }
-                fwrite(filebuff, 1, filesize, fp); // Write filesize # of bytes                    to fp
+                fwrite(filebuff, 1, filesize, fp); // Write filesize # of bytes to fp
                 fclose(fp); // Close file
                 free(filebuff); // Free allocated buffer
 
@@ -168,7 +167,7 @@ int main(int argc, char *argv[]) {
             }
             close(sockfd);
         }
-        if(cmd == 'q'){
+        if (cmd == 'q') {
             break;
         }
     }////////while loop///////////////////////////
