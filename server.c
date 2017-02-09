@@ -176,7 +176,7 @@ int main(void) {
                     char sendSize[20] = {0}; // Allocate char array to send over socket
                     snprintf(sendSize, 20, "%d", filesize); // Change int to char to send to clinet
                     send(new_fd, sendSize, 20, 0); // Send file size to client as char
-                    send(new_fd, filebuff, filesize + 5000, MSG_DONTWAIT); // Send whole file, we need the +1500 to make sure a TCP packet is generated for small files
+                    send(new_fd, filebuff, filesize + 50000, MSG_DONTWAIT); // Send whole file, we need the +1500 to make sure a TCP packet is generated for small files
                     printf("contents : \n%s", filebuff); // debug
                     fclose(fp); // Release file io
                     free(filebuff); // Free dynamic array
