@@ -19,19 +19,17 @@
 
 #define BACKLOG 10   // how many pending connections queue will hold
 
-void sigchld_handler(int s)
-{
-  while (waitpid(-1, NULL, WNOHANG) > 0);
+void sigchld_handler(int s) {
+    while (waitpid(-1, NULL, WNOHANG) > 0);
 }
 
 // get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa)
-{
-  if (sa->sa_family == AF_INET) {
-    return &(((struct sockaddr_in*)sa)->sin_addr);
-  }
+void *get_in_addr(struct sockaddr *sa) {
+    if (sa->sa_family == AF_INET) {
+        return &(((struct sockaddr_in *) sa)->sin_addr);
+    }
 
-  return &(((struct sockaddr_in6*)sa)->sin6_addr);
+    return &(((struct sockaddr_in6 *) sa)->sin6_addr);
 }
 
 
@@ -39,207 +37,184 @@ void *get_in_addr(struct sockaddr *sa)
 void error(char *s);
 
 
+int main(void) {
+    int sockfd, new_fd, numbytes;  // listen on sock_fd, new connection on new_fd
+    struct addrinfo hints, *servinfo, *p;
+    struct sockaddr_storage their_addr; // connector's address information
+    socklen_t sin_size;
+    struct sigaction sa;
+    int yes = 1;
+    char s[INET6_ADDRSTRLEN];
+    int rv;
+    char rec_cmd[100];
 
+    //For child Process
+    int pid;
+    int status;
 
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE; // use my IP
 
-
-
-int main(void)
-{
-  int sockfd, new_fd, numbytes;  // listen on sock_fd, new connection on new_fd
-  struct addrinfo hints, *servinfo, *p;
-  struct sockaddr_storage their_addr; // connector's address information
-  socklen_t sin_size;
-  struct sigaction sa;
-  int yes = 1;
-  char s[INET6_ADDRSTRLEN];
-  int rv;
-  char rec_cmd[100];
-
-  //For child Process
-  int pid;
-  int status;
-
-  memset(&hints, 0, sizeof hints);
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = AI_PASSIVE; // use my IP
-
-  if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
-    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-    return 1;
-  }
-
-  // loop through all the results and bind to the first we can
-  for (p = servinfo; p != NULL; p = p->ai_next) {
-    if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                         p->ai_protocol)) == -1) {
-      perror("server: socket");
-      continue;
+    if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+        return 1;
     }
 
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
-                   sizeof(int)) == -1) {
-      perror("setsockopt");
-      exit(1);
+    // loop through all the results and bind to the first we can
+    for (p = servinfo; p != NULL; p = p->ai_next) {
+        if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                             p->ai_protocol)) == -1) {
+            perror("server: socket");
+            continue;
+        }
+
+        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
+                       sizeof(int)) == -1) {
+            perror("setsockopt");
+            exit(1);
+        }
+
+        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+            close(sockfd);
+            perror("server: bind");
+            continue;
+        }
+
+        break;
     }
 
-    if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-      close(sockfd);
-      perror("server: bind");
-      continue;
+    if (p == NULL) {
+        fprintf(stderr, "server: failed to bind\n");
+        return 2;
     }
 
-    break;
-  }
+    freeaddrinfo(servinfo); // all done with this structure
 
-  if (p == NULL)  {
-    fprintf(stderr, "server: failed to bind\n");
-    return 2;
-  }
-
-  freeaddrinfo(servinfo); // all done with this structure
-
-  if (listen(sockfd, BACKLOG) == -1) {
-    perror("listen");
-    exit(1);
-  }
-
-  sa.sa_handler = sigchld_handler; // reap all dead processes
-  sigemptyset(&sa.sa_mask);
-  sa.sa_flags = SA_RESTART;
-  if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-    perror("sigaction");
-    exit(1);
-  }
-
-  printf("server: waiting for connections...\n");
-
-  while (1) { // main accept() loop
-    sin_size = sizeof their_addr;
-    new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
-    if (new_fd == -1) {
-      perror("accept");
-      continue;
-    }
-
-    inet_ntop(their_addr.ss_family,
-              get_in_addr((struct sockaddr *)&their_addr),
-              s, sizeof s);
-    printf("server: got connection from %s\n", s);
-
-    if (!fork()) {
-      close(sockfd);
-      if ((numbytes = recv(new_fd, rec_cmd, 100 - 1, 0)) == -1) {
-        perror("recv");
+    if (listen(sockfd, BACKLOG) == -1) {
+        perror("listen");
         exit(1);
-      }
+    }
 
-      rec_cmd[numbytes] = '\0';
+    sa.sa_handler = sigchld_handler; // reap all dead processes
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(1);
+    }
 
-      if (!strcmp(rec_cmd, "list")) /// list contents and send back////
-      {
-        printf("hi from ls cmd\n");
+    printf("server: waiting for connections...\n");
 
-
-        //ls command through child
-        if ((pid = fork()) == 0) {
-          dup2(new_fd, 1);
-          execl("/usr/bin/ls", "ls", (char *)NULL);
-          perror("could not exec 'ls'");
+    while (1) { // main accept() loop
+        sin_size = sizeof their_addr;
+        new_fd = accept(sockfd, (struct sockaddr *) &their_addr, &sin_size);
+        if (new_fd == -1) {
+            perror("accept");
+            continue;
         }
 
-        wait(&status);
-        exit(0);
-      }
-      printf("Hi bill: '%s'\n", rec_cmd);
+        inet_ntop(their_addr.ss_family,
+                  get_in_addr((struct sockaddr *) &their_addr),
+                  s, sizeof s);
+        printf("server: got connection from %s\n", s);
 
-      if (!strcmp(rec_cmd, "disp")) /// display file and send back ////
-      {
-        FILE *fp;
+        if (!fork()) {
+            close(sockfd);
+            if ((numbytes = recv(new_fd, rec_cmd, 100 - 1, 0)) == -1) {
+                perror("recv");
+                exit(1);
+            }
+
+            rec_cmd[numbytes] = '\0';
+
+            if (!strcmp(rec_cmd, "list")) /// list contents and send back////
+            {
+                printf("hi from ls cmd\n");
 
 
-        if ((numbytes = recv(new_fd, rec_cmd, 100 - 1, 0)) == -1)
-        {
-          perror("recvdisplay"); exit;
-        }
-        rec_cmd[numbytes] = '\0'; printf("got filename\n");
+                //ls command through child
+                if ((pid = fork()) == 0) {
+                    dup2(new_fd, 1);
+                    execl("/usr/bin/ls", "ls", (char *) NULL);
+                    error("could not exec 'ls'");
+                }
 
-        printf("filename to get: %s\n", rec_cmd);
-		
-	fp = fopen(rec_cmd, "r");
-        if (fp == NULL){
-          send(new_fd, "File not found", 14, 0);
-        printf("file not found");
-	}
-	else
-          {
-		fseek(fp, 0L, SEEK_END);
-		int filesize = ftell(fp);
-		fseek(fp, 0 , SEEK_SET);
-		char *filebuff = (char *) calloc(filesize, sizeof(char));
-		fread(filebuff, sizeof(char), filesize, fp);
-		fclose(fp);
-		send(numbytes/*new_fd*/, filebuff, filesize, 0);
-	//	free(filebuff);
-		
-		}
+                wait(&status);
+                exit(0);
+            }
+            printf("Hi bill: '%s'\n", rec_cmd);
 
-/*	while(1)
-	{
-	unsigned char buff[100]={0};
-	int nread = fread(buff, 1,100,fp);
-	printf("read bytes\n",nread);
+            if (!strcmp(rec_cmd, "disp")) /// display file and send back ////
+            {
 
-		//if(nread > 0)
-		//{
-		printf("sending\n");
-		write(numbytes,rec_cmd,/buff,/nread);
-		//}
-		if(nread < 100)
-		{
-			if(feof(fp))printf("end of file\n");
-			if(ferror(fp))printf("error reading\n");
-			break;
-		}
-		
-		
-	}*/
-	close(new_fd);
-	exit(0);
-      }
 
-      //Check command
-      if (!strcmp(rec_cmd, "chek"))
-      {
-        FILE *fp;
-        char filename[1000];
-        int numb;
+                FILE *fp;
 
-        if ((numb = recv(new_fd, filename, 100 - 1, 0)) == -1) {
-          perror("recv");
-          exit(1);
-        }
-        filename[numb] = '\0';
 
-        printf("Looking for %s\n", filename);
+                if ((numbytes = recv(new_fd, rec_cmd, 100 - 1, 0)) == -1) {
+                    perror("recvdisplay");
+                    exit;
+                }
+                rec_cmd[numbytes] = '\0';
+                printf("got filename\n");
 
-        fp = fopen(filename, "r");
-        if (fp == NULL)
-          send(new_fd, "no", 2, 0);
-        else
-          send(new_fd, "yes", 3, 0);
+                printf("filename to get: %s\n", rec_cmd);
 
-      }
-
-      close(new_fd);
-      exit(0);
-    }//end fork
-    close(new_fd);
+                fp = fopen(rec_cmd, "r"); // Open target file
+                if (fp == NULL) {
+                    send(new_fd, "0", 1, 0); // Send file size 0 to let client know not found
+                    printf("file not found");
+                } else {
+                    fseek(fp, 0L, SEEK_END); // Jump to end of file
+                    int filesize = ftell(fp); // Find byte size from byte 0 to EOF
+                    fseek(fp, 0, SEEK_SET); // Reset fp to top of file
+                    char *filebuff = calloc(filesize, sizeof(char)); //Allocate array for file
+                    printf("Size file: %d \n", filesize);
+                    fread(filebuff, sizeof(char), filesize, fp); // Read file size # of bytes to filebuff
+                    char sendSize[20] = {0}; // Allocate char array to send over socket
+                    snprintf(sendSize, 20, "%d", filesize); // Change int to char to send to clinet
+                    send(new_fd, sendSize, 20, 0); // Send file size to client as char
+                    send(new_fd, filebuff, filesize + 1500, 0); // Send whole file, we need the +1500 to make sure a TCP packet is generated for small files
+                    printf("contents : \n%s", filebuff); // debug
+                    fclose(fp); // Release file io
+                    free(filebuff); // Free dynamic array
 
 
 
-  }
+                }
+            }
 
-  return 0;
+            //Check command
+            if (!strcmp(rec_cmd, "chek")) {
+                FILE *fp;
+                char filename[1000];
+                int numb;
+
+                if ((numb = recv(new_fd, filename, 100 - 1, 0)) == -1) {
+                    perror("recv");
+                    exit(1);
+                }
+                filename[numb] = '\0';
+
+                printf("Looking for %s\n", filename);
+
+                fp = fopen(filename, "r");
+                if (fp == NULL)
+                    send(new_fd, "no", 2, 0);
+                else
+                    send(new_fd, "yes", 3, 0);
+
+            }
+
+            close(new_fd);
+            exit(0);
+        }//end fork
+        close(new_fd);
+
+
+    }
+
+    return 0;
 }
