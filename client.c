@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
                 printf("File not found"); // 0 indicates file not found
                 continue;
             }else {
-                char *filebuff = calloc(filesize, sizeof(char)); //Allocate char                    array of file size
+                char *filebuff = calloc(filesize + 1, sizeof(char)); //Allocate char                    array of file size
                 numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file                    to allocated array
                 printf("contents : \n%s", filebuff); // debug
                 printf("Save as: "); //client side filename
