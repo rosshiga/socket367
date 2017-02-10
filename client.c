@@ -85,7 +85,9 @@ int main(int argc, char *argv[]) {
         while(cmd != 'q'){ //////////////////////////////////while loop/////                   /////////////
         printf("............Welcome to the MC Command Hub.............\n");
         printf("Please input your command........'input: h for help'..\n");
-        scanf("%c", &cmd);
+        char commandString[1000]; //Parsing as char can result in unexpected behavior, read whole lines
+        scanf("%999s", commandString);
+            cmd = commandString[0];
         while (getchar() != '\n') continue;
         if (cmd == 'h') {
             printf("Please make your selection from the following commands\n");
@@ -109,7 +111,7 @@ int main(int argc, char *argv[]) {
                 bigCount +=numbytes;
                 strcat(bigBuffer, buf);
             }
-            while(buf[numbytes - 1] != 0);
+            while(numbytes == 99);
             bigBuffer[bigCount] = '\0';
             printf("%s\n", bigBuffer);
         }
