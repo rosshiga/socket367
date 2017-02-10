@@ -97,16 +97,21 @@ int main(int argc, char *argv[]) {
         }
         ///////////////check for commands//////////////////////////
         if (cmd == 'l') {
-
+            char bigBuffer[10000000];
+            int bigCount = 0;
             send(sockfd, "list", 4, 0);
-            //{//
-            //perror("send");
-            //close(sockfd);
-            //exit(0);
-            //}
-            numbytes = recv(sockfd, buf, MAXDATASIZE - 1, 0);
-            buf[numbytes] = '\0';
-            printf("%s\n", buf);
+
+            do{
+                if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+                    perror("recv");
+                    exit(1);
+                }
+                bigCount +=numbytes;
+                strcat(bigBuffer, buf);
+            }
+            while(buf[numbytes - 1] != 0);
+            bigBuffer[bigCount] = '\0';
+            printf("%s\n", bigBuffer);
         }
         if (cmd == 'c') {
             char ans[3];
