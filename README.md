@@ -9,8 +9,8 @@ Ross Higa, Jared Shimabukuro
 	- This will automatically compile *server.c* and *client.c* as well as run all of the executables.
 
 ##How to Manually Compile the Programs:
-- Run command 'make'
-	- This should generate executables **'server'** and **'client'**
+- Run command **make**
+	- This will generate executables **server** and **client**
 
 ##How to Manually Run the Programs:
 1. Run the server executable (use: **./server**)
