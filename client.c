@@ -215,6 +215,7 @@ int main(int argc, char *argv[]) {
             break;
         }
             close(sockfd);
+        sleep(1); // Let server reset to listen before reconnection
     }////////while loop///////////////////////////
 
 
