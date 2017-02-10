@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-    //while (cmd != 'q') {
+    while (cmd != 'q') {
         if ((rv = getaddrinfo(argv[1], PORT, &hints, &servinfo)) != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
             return 1;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
         char filename[MAXDATASIZE];
         freeaddrinfo(servinfo); // all done with this structure
 
-        while(cmd != 'q'){ //////////////////////////////////while loop/////                   /////////////
+       // while(cmd != 'q'){ //////////////////////////////////while loop/////                   /////////////
         printf("............Welcome to the MC Command Hub.............\n");
         printf("Please input your command........'input: h for help'..\n");
         char commandString[1000]; //Parsing as char can result in unexpected behavior, read whole lines
