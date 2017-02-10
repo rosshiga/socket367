@@ -207,7 +207,6 @@ int main(int argc, char *argv[]) {
                     numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file  to allocated array
                     printf("contents : \n%s", filebuff); // debug
 
-                    fclose(fp); // Close file
                     free(filebuff); // Free allocated buffer
 
 
