@@ -184,7 +184,6 @@ int main(int argc, char *argv[]) {
 
 
             }
-            close(sockfd);
         }
             if (cmd == 'p') // display function
             {
@@ -211,7 +210,6 @@ int main(int argc, char *argv[]) {
 
 
                 }
-                close(sockfd);
             }
         if (cmd == 'q') {
             break;
