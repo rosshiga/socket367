@@ -209,13 +209,13 @@ int main(void) {
 
             }
 
-
+            close(new_fd);
             exit(0);
         }//end fork
-
+        close(new_fd);
 
 
     }
-    close(new_fd);
+
     return 0;
 }
