@@ -4,11 +4,7 @@
 ##Contributors:
 Ross Higa, Jared Shimabukuro
 
-##How to Automatically Compile and Run the Programs
-- Run command ```./run.sh```
-	- This will automatically compile *server.c* and *client.c* as well as run all of the executables.
-
-##How to Manually Compile the Programs:
+##How to Compile the Programs:
 - Run command ```make```
 	- This will generate executables ```server``` and ```client```
 
