@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
         }
         ///////////////check for commands//////////////////////////
         if (cmd == 'l') {
-            char bigBuffer[10000000];
+            char bigBuffer[INT_MAX];
             int bigCount = 0;
             send(sockfd, "list", 4, 0);
 
