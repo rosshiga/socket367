@@ -214,8 +214,9 @@ int main(int argc, char *argv[]) {
         if (cmd == 'q') {
             break;
         }
+            close(sockfd);
     }////////while loop///////////////////////////
-    close(sockfd);
+
 
     return 0;
 }
