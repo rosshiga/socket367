@@ -6,13 +6,13 @@ Ross Higa, Jared Shimabukuro
 
 ##How to Compile:
 - Run command 'make'
-	- This should generate executables 'server367.exe' and 'client367.exe'
+	- This should generate executables 'server' and 'client'
 
 ##How to Run the Program:
-1. Run the server executable (use: ./server367.exe)
+1. Run the server executable (use: ./server)
 2. Suspend the server program (use: ctrl-Z)
 3. Run the server program in the background (use: bg)
-4. Run the client executable with the domain 'wiliki.eng.hawaii.edu (use: ./client367.exe wiliki.eng.hawaii.edu)
+4. Run the client executable with the domain 'wiliki.eng.hawaii.edu (use: ./client wiliki.eng.hawaii.edu)
 5. Enter a single-letter command (for a list of commands, use 'h')
 	- For a list of the server's directory contents, use 'l'
 	- To check if a file exists in the server, use 'c'
