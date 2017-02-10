@@ -14,7 +14,7 @@
 
 #include <arpa/inet.h>
 
-#define PORT "3521" // the port client will be connecting to
+#define PORT "3510" // the port client will be connecting to
 
 #define MAXDATASIZE 100 // max number of bytes we can get at once
 
@@ -32,12 +32,12 @@ int main(int argc, char *argv[]) {
     struct addrinfo hints, *servinfo, *p;
     int rv;
     char s[INET6_ADDRSTRLEN];
-    char cmd = 't';          //user command input storage
+    char commandLetter = 't';          //user command input storage
 
-    //  while(cmd != 'q'){/////////////////////////while loop//////////////////
+    //  while(commandLetter != 'q'){/////////////////////////while loop//////////////////
     //    printf("whats your input?\n");
-    //    scanf("%c",cmd);
-    //  printf("%c\n",cmd);
+    //    scanf("%c",commandLetter);
+    //  printf("%c\n",commandLetter);
 
     if (argc != 2) {
         fprintf(stderr, "usage: client hostname\n");
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-    while (cmd != 'q') {
+    while (commandLetter != 'q') {
         if ((rv = getaddrinfo(argv[1], PORT, &hints, &servinfo)) != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
             return 1;
@@ -82,14 +82,14 @@ int main(int argc, char *argv[]) {
         char filename[MAXDATASIZE];
         freeaddrinfo(servinfo); // all done with this structure
 
-       // while(cmd != 'q'){ //////////////////////////////////while loop/////                   /////////////
+        // while(commandLetter != 'q'){ //////////////////////////////////while loop/////                   /////////////
         printf("............Welcome to the MC Command Hub.............\n");
-        printf("Please input your command........'input: h for help'..\n");
+        printf("Please input your command (h for help): ");
         char commandString[1000]; //Parsing as char can result in unexpected behavior, read whole lines
         scanf("%999s", commandString);
-            cmd = commandString[0];
+        commandLetter = tolower(commandString[0]);
         while (getchar() != '\n') continue;
-        if (cmd == 'h') {
+        if (commandLetter == 'h') {
             printf("Please make your selection from the following commands\n");
             printf("'l' = List contents of server.....ex(l)...............\n");
             printf("'c' = Check for a file name.......ex(c <filename>)....\n");
@@ -97,25 +97,22 @@ int main(int argc, char *argv[]) {
             printf("'p' = Display file name...........ex(p <filename>)....\n");
             printf("'q' = Quit............................................\n");
         }
-        ///////////////check for commands//////////////////////////
-        if (cmd == 'l') {
-            char bigBuffer[10000];
-            int bigCount = 0;
+        if (commandLetter == 'l') {
+            char bigBuffer[10000]; // Allocate buffer
+            int bigCount = 0; // Counter for bigbuffer
             send(sockfd, "list", 4, 0);
-
-            do{
-                if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+            do {
+                if ((numbytes = recv(sockfd, buf, MAXDATASIZE - 1, 0)) == -1) {
                     perror("recv");
                     exit(1);
                 }
-                bigCount +=numbytes;
-                strcat(bigBuffer, buf);
-            }
-            while(numbytes == 99);
-            bigBuffer[bigCount] = '\0';
+                bigCount += numbytes; // Add bytes recieved to count
+                strcat(bigBuffer, buf); // Dump buf into bigBuffer
+            } while (numbytes == MAXDATASIZE - 1); // If we didnt get max packet size, assume there is more data
+            bigBuffer[bigCount] = '\0'; // Null terminate string
             printf("%s\n", bigBuffer);
         }
-        if (cmd == 'c') {
+        if (commandLetter == 'c') {
             char ans[3];
             int numb;
             send(sockfd, "chek", 4, 0);
@@ -136,10 +133,10 @@ int main(int argc, char *argv[]) {
 
         }
 
-        if (cmd == 'd') // download function
+        if (commandLetter == 'd') // download function
         {
 
-            send(sockfd, "disp", 50, 0); //send server cmd input
+            send(sockfd, "disp", 50, 0); //send server commandLetter input
             printf("enter file name: \n"); //client side file name
             scanf("%s", &filename);
             int filesize;
@@ -185,36 +182,36 @@ int main(int argc, char *argv[]) {
 
             }
         }
-            if (cmd == 'p') // display function
-            {
+        if (commandLetter == 'p') // display function
+        {
 
-                send(sockfd, "disp", 50, 0); //send server cmd input
-                printf("enter file name: \n"); //client side file name
-                scanf("%s", &filename);
-                int filesize;
-                char sizeofFile[20] = {0};
-                send(sockfd, filename, 100, 0); //receive server file string
-                numbytes = recv(sockfd, sizeofFile, 20, 0); // Receive back the file size from server
-                filesize = (int) strtol(sizeofFile, (char **) NULL, 10); //Change the  chars the server sent us back to int
-                printf("Size file: %d \n", filesize);
-                if (filesize == 0) {
-                    printf("File not found"); // 0 indicates file not found
-                    continue;
-                } else {
-                    char *filebuff = calloc(filesize + 1, sizeof(char)); //Allocate char rray of file size
-                    sleep(1);
-                    numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file  to allocated array
-                    printf("contents : \n%s", filebuff); // debug
+            send(sockfd, "disp", 50, 0); //send server commandLetter input
+            printf("enter file name: \n"); //client side file name
+            scanf("%s", &filename);
+            int filesize;
+            char sizeofFile[20] = {0};
+            send(sockfd, filename, 100, 0); //receive server file string
+            numbytes = recv(sockfd, sizeofFile, 20, 0); // Receive back the file size from server
+            filesize = (int) strtol(sizeofFile, (char **) NULL, 10); //Change the  chars the server sent us back to int
+            printf("Size file: %d \n", filesize);
+            if (filesize == 0) {
+                printf("File not found"); // 0 indicates file not found
+                continue;
+            } else {
+                char *filebuff = calloc(filesize + 1, sizeof(char)); //Allocate char rray of file size
+                sleep(1);
+                numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file  to allocated array
+                printf("contents : \n%s", filebuff); // debug
 
-                    free(filebuff); // Free allocated buffer
+                free(filebuff); // Free allocated buffer
 
 
-                }
             }
-        if (cmd == 'q') {
+        }
+        if (commandLetter == 'q') {
             break;
         }
-            close(sockfd);
+        close(sockfd);
         sleep(1); // Let server reset to listen before reconnection
     }////////while loop///////////////////////////
 
