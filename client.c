@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-    while (cmd != 'q') {
+    //while (cmd != 'q') {
         if ((rv = getaddrinfo(argv[1], PORT, &hints, &servinfo)) != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
             return 1;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
         char filename[MAXDATASIZE];
         freeaddrinfo(servinfo); // all done with this structure
 
-        //  while(cmd != 'q'){ //////////////////////////////////while loop/////                   /////////////
+        while(cmd != 'q'){ //////////////////////////////////while loop/////                   /////////////
         printf("............Welcome to the MC Command Hub.............\n");
         printf("Please input your command........'input: h for help'..\n");
         scanf("%c", &cmd);
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
                 char *filebuff = calloc(filesize + 1, sizeof(char)); //Allocate char rray of file size
                 sleep(1);
                 numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file  to allocated array
-                printf("contents : \n%s", filebuff); // debug
+                // printf("contents : \n%s", filebuff); // debug
                 printf("Save as: "); //client side filename
                 scanf("%s", &filename);
                 //download file from server
