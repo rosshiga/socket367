@@ -136,9 +136,8 @@ int main(int argc, char *argv[]) {
 
         }
 
-        if (cmd == 'p') // display function
+        if (cmd == 'd') // download function
         {
-
 
             send(sockfd, "disp", 50, 0); //send server cmd input
             printf("enter file name: \n"); //client side file name
@@ -187,6 +186,34 @@ int main(int argc, char *argv[]) {
             }
             close(sockfd);
         }
+            if (cmd == 'p') // display function
+            {
+
+                send(sockfd, "disp", 50, 0); //send server cmd input
+                printf("enter file name: \n"); //client side file name
+                scanf("%s", &filename);
+                int filesize;
+                char sizeofFile[20] = {0};
+                send(sockfd, filename, 100, 0); //receive server file string
+                numbytes = recv(sockfd, sizeofFile, 20, 0); // Receive back the file size from server
+                filesize = (int) strtol(sizeofFile, (char **) NULL, 10); //Change the  chars the server sent us back to int
+                printf("Size file: %d \n", filesize);
+                if (filesize == 0) {
+                    printf("File not found"); // 0 indicates file not found
+                    continue;
+                } else {
+                    char *filebuff = calloc(filesize + 1, sizeof(char)); //Allocate char rray of file size
+                    sleep(1);
+                    numbytes = recv(sockfd, filebuff, filesize, 0); // Receive file  to allocated array
+                    printf("contents : \n%s", filebuff); // debug
+
+                    fclose(fp); // Close file
+                    free(filebuff); // Free allocated buffer
+
+
+                }
+                close(sockfd);
+            }
         if (cmd == 'q') {
             break;
         }
